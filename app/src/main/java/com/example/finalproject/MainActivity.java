@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
     public void startQuiz(View view){
-        SQL.AddToTable();
+//        SQL.AddToTable();
         Intent QuizScreen = new Intent(this, QuizScreen.class);
         startActivity(QuizScreen);
 
