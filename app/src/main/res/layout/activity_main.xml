@@ -7,29 +7,38 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:weightSum="100"
         android:background="@color/blue"
         android:padding="10dp"
         android:orientation="vertical">
 
         <ImageView
             android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="95"
-            android:src="@drawable/splash_logo"
+            android:layout_height="572dp"
             android:layout_gravity="center"
-            />
+            android:src="@drawable/splash_logo" />
 
         <Button
-            android:onClick="startQuiz"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginTop="10dp"
             android:backgroundTint="@android:color/white"
-            android:textColor="@color/gray"
-            android:textSize="20dp"
-            android:textAllCaps="false"
+            android:onClick="startQuiz"
             android:text="@string/buttonFirstScreen"
-            android:layout_marginHorizontal="10dp" />
+            android:textAllCaps="false"
+            android:textColor="@color/gray"
+            android:textSize="20dp" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"
+            android:backgroundTint="@android:color/white"
+            android:onClick="getResult"
+            android:text="@string/ResultText"
+            android:textAllCaps="false"
+            android:textColor="@color/gray"
+            android:textSize="20dp" />
 
     </LinearLayout>
 

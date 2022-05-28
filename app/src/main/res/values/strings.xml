@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">FinalProject</string>
     <string name="buttonFirstScreen">Let`s Play</string>
+    <string name="ResultText">Result</string>
 </resources>

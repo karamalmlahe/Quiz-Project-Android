@@ -15,10 +15,15 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.FileOutputStream;
 import java.security.AccessController;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
+import java.util.TimeZone;
 
 public class QuizScreen extends AppCompatActivity {
     private SqlLiteFuncs SQL;
@@ -26,8 +31,9 @@ public class QuizScreen extends AppCompatActivity {
     private int counter;
     private int QuestionCount;
     private CountDownTimer countDownTimer;
-    private long timerLeft=20000;
-    private static List<WrongAnswer>WrongAnswers;
+    private long timerLeft=40000;
+    private static WrongAnswer []WrongAnswers;
+    private static int i;//for WrongAnswers array
 
 
     private LinearLayout container;
@@ -43,9 +49,10 @@ public class QuizScreen extends AppCompatActivity {
         SQL= new SqlLiteFuncs(this);
         SQL.GetAllQuestions();
         q=SQL.getRandomQuestion();
-        WrongAnswers=new ArrayList<WrongAnswer>();
+        i=0;
         counter=0;
-        QuestionCount=10;
+        QuestionCount=20    ;
+        WrongAnswers=new WrongAnswer[QuestionCount];
 
         container =(LinearLayout) findViewById(R.id.container);
 
@@ -121,11 +128,21 @@ public class QuizScreen extends AppCompatActivity {
                         container.removeAllViews();
                         getNextQuestion();
                         countDownTimer.cancel();
-                        timerLeft=20000;
+                        if(counter<=10){
+                            timerLeft=40000;
+                        }
+                        else if(counter<=15){
+                            timerLeft=20000;
+                        }
+                        else{
+                            timerLeft=10000;
+                        }
+
                         startTimer();
                     }
                     else{
                         countDownTimer.cancel();
+                        saveUserScore();
                         Intent WrongAnswersScreen = new Intent(QuizScreen.this,WrongAnswersScreen.class);
                         startActivity(WrongAnswersScreen);
 
@@ -142,7 +159,8 @@ public class QuizScreen extends AppCompatActivity {
     }
     private  void checkAnswer (String UserAnswer){
         if(!UserAnswer.equals(q.GetCorrect())){
-            WrongAnswers.add(new WrongAnswer(q.GetQuestion(),q.GetCorrect(),UserAnswer));
+            WrongAnswers[i]=(new WrongAnswer(q.GetQuestion(),q.GetCorrect(),UserAnswer));
+            i++;
         }
     }
 
@@ -159,7 +177,7 @@ public class QuizScreen extends AppCompatActivity {
                     timerLeft=millisUntilFinished;
 
                     Timer.setText(String.format("00:%02d",timerLeft/1000));
-                    Toast.makeText(QuizScreen.this,String.format("00:%02d",timerLeft/1000),Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(QuizScreen.this,String.format("00:%02d",timerLeft/1000),Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
@@ -168,11 +186,22 @@ public class QuizScreen extends AppCompatActivity {
                         checkAnswer("N/A");
                         container.removeAllViews();
                         getNextQuestion();
-                        timerLeft=20000;
+                        countDownTimer.cancel();
+                        if(counter<=10){
+                            timerLeft=40000;
+                        }
+                        else if(counter<=15){
+                            timerLeft=20000;
+                        }
+                        else{
+                            timerLeft=10000;
+                        }
+
                         startTimer();
                     }
                     else{
                         countDownTimer.cancel();
+                        saveUserScore();
                         Intent WrongAnswersScreen = new Intent(QuizScreen.this,WrongAnswersScreen.class);
                         startActivity(WrongAnswersScreen);
                     }
@@ -184,7 +213,35 @@ public class QuizScreen extends AppCompatActivity {
         }
     }
 
-    public static List<WrongAnswer> getWrongAnswers(){
+
+    private  void saveUserScore(){
+        FileOutputStream fos=null;
+        try{
+            fos=openFileOutput("userScore.txt",MODE_APPEND);
+
+            Calendar calendar= Calendar.getInstance();
+            TimeZone timeZone= TimeZone.getTimeZone("Israel");
+            calendar.setTimeZone(timeZone);
+            int d=calendar.get(Calendar.DATE);
+            int m=calendar.get(Calendar.MONTH)+1;
+            int y=calendar.get(Calendar.YEAR);
+            int h=calendar.get(Calendar.HOUR);
+            int mi=calendar.get(Calendar.MINUTE);
+
+            String str= d+"/"+m+"/"+y+""+" " +h+":"+mi+"|"+(QuestionCount-i)+"/"+QuestionCount+"\n";
+            fos.write(str.getBytes());
+            fos.close();
+            Toast.makeText(this,"Score Saved",Toast.LENGTH_LONG).show();
+
+        }
+        catch(Exception err)
+        {
+            Toast.makeText(this,err.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public static WrongAnswer[] getWrongAnswers(){
         return WrongAnswers;
     }
+    public static int getNumberOfWrongAnswers(){return i;};
 }
